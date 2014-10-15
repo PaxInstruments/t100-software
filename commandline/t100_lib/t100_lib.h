@@ -13,11 +13,17 @@
 #define VID 0x16c0
 #define PID 0x05df
 
+#define MAXIMUM_T100_DEVICES 64
+
 class t100
 {
 	private:	
 	
-	hid_device* t100_handle;
+	int t100_totalDevices;
+
+	hid_device* t100_handle;	
+
+	int t100_deviceSerials[MAXIMUM_T100_DEVICES];	
 
 	public:
 	
@@ -30,13 +36,29 @@ class t100
 	t100();
 
 	/**
-	  * Tries to connect to first t100 device it could find, without any serial 
+	  * Try to connect to first t100 device it could find, without any serial 
 	  * number matching.
 	  * 
-	  * @param (none)  
+	  * @param (none)
 	  * @return 0 for success and -1 for error
 	  */
 	int connectBasic();
+
+	/**
+	  * Try to connect to specific t100 device with special serial number.	  
+	  * 
+	  * @param serial Specific serial number you want 
+	  * @return 0 for success and -1 for error
+	  */
+	int connectBySerial(int serial);
+
+	/**
+	  * Search t100 devices around USB bus and fill t100_deviceSerials array.
+	  * 
+	  * @param (none)
+	  * @return Number of devices found for success and -1 for error
+	  */
+	int searchDevices();
 
 	/**
 	  * Low level data sending function
