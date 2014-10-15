@@ -1,3 +1,0 @@
-[submodule "t100_test_hidapi/hidapi"]
-	path = t100_test_hidapi/hidapi
-	url = https://github.com/signal11/hidapi.git
