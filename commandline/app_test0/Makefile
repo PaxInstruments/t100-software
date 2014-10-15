@@ -2,7 +2,7 @@
 # Cross-platform Makefile for t100-software
 # <ihsan@kehribar.me> - 2014 
 #------------------------------------------------------------------------------
-TARGET = t100_test
+TARGET = test0
 
 all: $(TARGET)
 
@@ -18,7 +18,7 @@ ifeq ($(shell uname), Linux)
 # OSX specific configuration
 #------------------------------------------------------------------------------
 else ifeq ($(shell uname), Darwin)
-	COBJS = ./hidapi/mac/hid.o
+	COBJS = ../hidapi/mac/hid.o
 	LIBS  = -framework IOKit -framework CoreFoundation
 #------------------------------------------------------------------------------
 # Windows specific configuration
@@ -31,11 +31,11 @@ endif
 #------------------------------------------------------------------------------
 # Add .cpp files to this line with .o extension
 #------------------------------------------------------------------------------
-CPPOBJS += $(TARGET).o t100_lib.o 
+CPPOBJS += $(TARGET).o ../t100_lib/t100_lib.o 
 #------------------------------------------------------------------------------
 
 OBJS     = $(COBJS) $(CPPOBJS)
-CFLAGS  += -I ./hidapi/hidapi -Wall -g -c
+CFLAGS  += -I ../hidapi/hidapi -I ../t100_lib -Wall -g -c
 
 $(TARGET): $(OBJS)	
 	g++ -Wall -g $^ $(LIBS) -o $(TARGET)
