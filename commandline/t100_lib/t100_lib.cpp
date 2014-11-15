@@ -29,6 +29,41 @@ int t100::connectBasic()
 	}
 }
 /*---------------------------------------------------------------------------*/
+int t100::searchDevices()
+{	
+	// Enumerate and print the HID devices on the system
+	struct hid_device_info *devs, *cur_dev;
+
+	t100_totalDevices = 0;
+	
+	devs = hid_enumerate(0x0, 0x0);
+	cur_dev = devs;	
+	while (cur_dev) {
+		
+		if((cur_dev->vendor_id == VID) && (cur_dev->product_id == PID))
+		{			
+			t100_deviceSerials[t100_totalDevices] = wcstoul(cur_dev->serial_number,NULL,0);
+			t100_totalDevices++;
+		}		
+		cur_dev = cur_dev->next;
+	}
+	hid_free_enumeration(devs);
+
+  return t100_totalDevices;
+}
+/*---------------------------------------------------------------------------*/
+int t100::getSerialNumber(uint8_t arrayIndex)
+{
+	if(arrayIndex >= t100_totalDevices)
+	{
+		return -1;
+	}
+	else
+	{
+		return t100_deviceSerials[arrayIndex];
+	}	
+}
+/*---------------------------------------------------------------------------*/
 int t100::sendData(uint8_t* buf, uint8_t len)
 {
 	int rval;

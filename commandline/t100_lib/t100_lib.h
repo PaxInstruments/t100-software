@@ -61,6 +61,15 @@ class t100
 	int searchDevices();
 
 	/**
+	  * Access t100_deviceSerials array from your application. 
+	  * 
+	  * @param t100_deviceSerials array index
+	  * @return Serial number of the device. If there isn't any device serial 
+	  * at that location, function returns -1
+	  */
+	int getSerialNumber(uint8_t arrayIndex);
+
+	/**
 	  * Low level data sending function
 	  * 
 	  * @param buf Data buffer to be sent
