@@ -29,6 +29,23 @@ int t100::connectBasic()
 	}
 }
 /*---------------------------------------------------------------------------*/
+int t100::connectBySerial(int serial)
+{
+	wchar_t buf[16];
+    swprintf(buf, sizeof(buf) / sizeof(*buf), L"%d", serial);
+
+    this->t100_handle = hid_open(VID, PID, buf);
+	
+	if(!(this->t100_handle))
+	{		
+ 		return -1;
+	}	
+	else
+	{
+		return 0;
+	}
+}
+/*---------------------------------------------------------------------------*/
 int t100::searchDevices()
 {	
 	// Enumerate and print the HID devices on the system
