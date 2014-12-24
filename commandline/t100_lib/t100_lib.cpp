@@ -154,6 +154,7 @@ int t100::periodicUpdate()
     return -1;
   }
 
+  return 0;
 }
 /*---------------------------------------------------------------------------*/
 float t100::getColdJunctionTemperature()
