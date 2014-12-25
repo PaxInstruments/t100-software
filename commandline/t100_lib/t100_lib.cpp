@@ -14,6 +14,8 @@ t100::t100()
   this->t100_handle = NULL;
 
   this->t100_totalDevices = 0;
+
+  this->mcp3421_pgaSet = 1;
 }
 /*---------------------------------------------------------------------------*/
 int t100::connectBasic()
@@ -33,10 +35,10 @@ int t100::connectBasic()
 int t100::connectBySerial(int serial)
 {
   wchar_t buf[16];
-    swprintf(buf, sizeof(buf) / sizeof(*buf), L"%d", serial);
+  swprintf(buf, sizeof(buf) / sizeof(*buf), L"%d", serial);
 
-    this->t100_handle = hid_open(VID, PID, buf);
-  
+  this->t100_handle = hid_open(VID, PID, buf);
+
   if(!(this->t100_handle))
   {   
     return -1;
@@ -188,10 +190,50 @@ float t100::getAdcVoltage()
     tmp32 -= 0x3FFFF;
   }
 
-  /* TODO: ADC step size _will_ change based on the PGA setting! */
-  microvolts = tmp32 * 15.625;
+  microvolts = tmp32 * 15.625 * (float)(this->mcp3421_pgaSet);
   milivolts = microvolts / 1000.0;
 
   return milivolts;
+}
+/*---------------------------------------------------------------------------*/
+int t100::setPgaGain(uint8_t gain)
+{
+  int rval;
+  uint8_t bitVal;
+
+  if(gain == 1)
+  {
+    bitVal = 0;
+  }
+  else if(gain == 2)
+  {
+    bitVal = 1; 
+  }
+  else if(gain == 4)
+  {
+    bitVal = 2;
+  }
+  else if(gain == 8)
+  {
+    bitVal = 3;
+  }
+  else
+  {
+    return -1;
+  }  
+
+  /* Set PGA command */
+  internalBuffer[0] = 1;     
+  internalBuffer[1] = bitVal;
+  rval = sendData(internalBuffer,32);
+
+  if(rval < 0)
+  {  
+    return -1;
+  }
+
+  this->mcp3421_pgaSet = gain;   
+
+  return 0;
 }
 /*---------------------------------------------------------------------------*/

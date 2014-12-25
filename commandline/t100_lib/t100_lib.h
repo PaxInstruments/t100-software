@@ -18,6 +18,8 @@
 class t100
 {
   private:  
+
+  int mcp3421_pgaSet;
   
   int t100_totalDevices;
 
@@ -113,5 +115,13 @@ class t100
     * @return ADC value in milivolts
     */
   float getAdcVoltage();
+
+  /**
+    * Sets the PGA value for MCP3421 
+    *
+    * @param gain PGA set. Valid values are 1, 2, 4 and 8.
+    * @return 0 for success and -1 for error
+    */
+  int setPgaGain(uint8_t gain);
 
 };
