@@ -33,6 +33,8 @@ int main(int argc, char* argv[])
 		printf("> T100 connection OK!\n");
 	}
 
+	myT100.setPgaGain(2);
+
 	while(1)
 	{
 		rval = myT100.periodicUpdate();
