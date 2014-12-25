@@ -190,7 +190,7 @@ float t100::getAdcVoltage()
     tmp32 -= 0x3FFFF;
   }
 
-  microvolts = tmp32 * 15.625 * (float)(this->mcp3421_pgaSet);
+  microvolts = tmp32 * 15.625 / (float)(this->mcp3421_pgaSet);
   milivolts = microvolts / 1000.0;
 
   return milivolts;
@@ -223,7 +223,7 @@ int t100::setPgaGain(uint8_t gain)
   }  
 
   /* Set PGA command */
-  internalBuffer[0] = 1;     
+  internalBuffer[0] = 4;     
   internalBuffer[1] = bitVal;
   rval = sendData(internalBuffer,32);
 
