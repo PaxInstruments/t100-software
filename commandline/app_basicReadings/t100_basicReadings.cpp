@@ -33,7 +33,8 @@ int main(int argc, char* argv[])
 		printf("> T100 connection OK!\n");
 	}
 
-	myT100.setPgaGain(2);
+	myT100.setPgaGain(8);
+	myT100.setThermocoupleType(KType);
 
 	while(1)
 	{
@@ -45,9 +46,10 @@ int main(int argc, char* argv[])
 			return -1;
 		}
 
-		printf("\n");
-		printf("> Cold junction temperature: %.3f C\n",myT100.getColdJunctionTemperature());
+		printf("\n\n");
+		printf("> Cold junction temperature: %.3f C\n",myT100.getColdJunctionTemperature());		
 		printf("> ADC voltage reading:       %.3f mV\n",myT100.getAdcVoltage());
+		printf("> Thermocouple temperature:  %.3f C\r\n",myT100.getThermocoupleTemperature());		
 
 		/* 500 miliseconds delay */
 		usleep(500 * 1000);
