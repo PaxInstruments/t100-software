@@ -165,7 +165,8 @@ float t100::getColdJunctionTemperature()
   float temperature;
 
   /* Convert raw data to celsius */
-  tmp16 = (internalBuffer[4] << 8) | internalBuffer[5];
+  /* TODO: Add additional eq function */
+  tmp16 = (internalBuffer[5] << 8) | internalBuffer[6];
   tmp16 = tmp16 >> 4;
   temperature = tmp16 * 0.0625;
 
@@ -174,12 +175,13 @@ float t100::getColdJunctionTemperature()
 /*---------------------------------------------------------------------------*/
 float t100::getAdcVoltage()
 {
-  int32_t tmp32;
+  uint32_t tmp32;
+  int32_t tmpi32;
   float microvolts;
   float milivolts;
-
+  
   /* Make 24bit raw data from 8bit packets */
-  tmp32 = internalBuffer[2] + (internalBuffer[1] << 8) + (internalBuffer[0] << 16);
+  tmp32 = internalBuffer[3] + (internalBuffer[2] << 8) + (internalBuffer[1] << 16);
 
   /* Mask only relevant 18 bits */  
   tmp32 = tmp32 & 0x3FFFF;
@@ -187,10 +189,14 @@ float t100::getAdcVoltage()
   /* 2s compliment signed conversion */
   if (tmp32 & (1<<17))
   {
-    tmp32 -= 0x3FFFF;
+    tmpi32 = tmp32 - 0x3FFFF;
+  }
+  else
+  {
+    tmpi32 = tmp32;
   }
 
-  microvolts = tmp32 * 15.625 / (float)(this->mcp3421_pgaSet);
+  microvolts = tmpi32 * 15.625 / (float)(this->mcp3421_pgaSet);
   milivolts = microvolts / 1000.0;
 
   return milivolts;
@@ -237,3 +243,63 @@ int t100::setPgaGain(uint8_t gain)
   return 0;
 }
 /*---------------------------------------------------------------------------*/
+int t100::setThermocoupleType(int type)
+{
+  /* TODO: Check whether this is a valid type or not! */
+  this->thermocoupleTypeInd = type;
+
+  return 0;
+}
+/*---------------------------------------------------------------------------*/
+float t100::getThermocoupleTemperature()
+{
+  float temperature;
+  int partialGroupCount; 
+  float thermocouple_mv;
+  TCCOEF_TYPEDEF partialCoeff;
+  const TCCOEF_TYPEDEF* currentCoeffs;
+  
+  /* Get the correct data coefficients */
+  /* NOTE: We expect a valid 'thermocoupleTypeInd' here. */
+  currentCoeffs = ThermoCoeffArray[this->thermocoupleTypeInd].coeff;  
+  partialGroupCount = ThermoCoeffArray[this->thermocoupleTypeInd].partialCoeffCount;
+
+  /* Let's get the current thermocouple voltage */
+  periodicUpdate();
+  thermocouple_mv = getAdcVoltage();
+
+  /* Let's check the boundaries of the current thermocouple data type */
+  if(thermocouple_mv < currentCoeffs[0].mV_LOW)
+  {
+    /* Our current TC voltage is lower than the lowest */
+    return -999.0;
+  }
+  else if(thermocouple_mv > currentCoeffs[(partialGroupCount-1)].mV_HIGH)
+  {
+    /* Our current TC voltage is higher than the highest */
+    return 999.0;
+  }
+
+  /* OK, we are in limits but which partial group should we use? */
+  for(int i=0; i<partialGroupCount; i++)
+  {
+    if((thermocouple_mv >= currentCoeffs[i].mV_LOW) && (thermocouple_mv <= currentCoeffs[i].mV_HIGH))
+    {
+      /* Store the final coeff we are going to use */
+      partialCoeff = currentCoeffs[i]; 
+      
+      /* Break the loop */
+      i = 999; 
+    }
+  }
+
+  /* Calculate the polynomial result */
+  temperature = getColdJunctionTemperature();
+  temperature += partialCoeff.coeff[0];
+  for(int i=1; i<10; i++)
+  {
+    temperature += partialCoeff.coeff[i] * pow(thermocouple_mv,i);
+  }
+
+  return temperature;
+}

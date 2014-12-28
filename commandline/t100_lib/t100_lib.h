@@ -4,11 +4,16 @@
 /
 /
 /----------------------------------------------------------------------------*/
+#ifndef T100_LIB
+#define T100_LIB
+
+#include <math.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <string.h>
 #include <stdlib.h>
 #include "hidapi.h"
+#include "thermocoupleCoefficients.h"
 
 #define VID 0x16c0
 #define PID 0x05df
@@ -24,6 +29,8 @@ class t100
   int t100_totalDevices;
 
   hid_device* t100_handle;  
+
+  int thermocoupleTypeInd;
 
   int t100_deviceSerials[MAXIMUM_T100_DEVICES];   
 
@@ -124,4 +131,25 @@ class t100
     */
   int setPgaGain(uint8_t gain);
 
+  /**
+    * Sets the thermocouple type. ADC Voltage will be interpreted based on the 
+    * thermocouple type, so it is important to set the correct one before
+    * start measuring.
+    *
+    * @param type Thermocouple type.
+    * @return 0 for success and -1 for wrong thermocouple type.
+    */
+  int setThermocoupleType(int type);
+
+  /**
+    * Main end-user function. Use this to query the temperature of the thermocouple. 
+    * Value is calculated using cold junction temperature, ADC readout, ADC gain
+    * and thermocouple type.
+    *
+    * @return Thermocouple temperature in celsius
+    */
+  float getThermocoupleTemperature();
+
 };
+
+#endif
