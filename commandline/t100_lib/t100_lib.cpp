@@ -16,6 +16,8 @@ t100::t100()
   this->t100_totalDevices = 0;
 
   this->mcp3421_pgaSet = 1;
+
+  setThermocoupleType(KType);
 }
 /*---------------------------------------------------------------------------*/
 int t100::connectBasic()
@@ -45,8 +47,14 @@ int t100::connectBySerial(int serial)
   } 
   else
   {
+    mySerialNumber = serial;
     return 0;
   }
+}
+/*---------------------------------------------------------------------------*/
+int t100::getMySerialNumber()
+{
+  return mySerialNumber;
 }
 /*---------------------------------------------------------------------------*/
 int t100::searchDevices()

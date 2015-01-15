@@ -25,6 +25,8 @@ class t100
   private:  
 
   int mcp3421_pgaSet;
+
+  int mySerialNumber;
   
   int t100_totalDevices;
 
@@ -77,6 +79,15 @@ class t100
     * at that location, function returns -1
     */
   int getSerialNumber(uint8_t arrayIndex);
+
+  /**
+    * Use this for personal identificaiton.
+    * 
+    * @param (none)
+    * @return Serial number of the currently connected device. If there is no 
+    * connection, function returns -1
+    */
+  int getMySerialNumber();
 
   /**
     * Low level data sending function
