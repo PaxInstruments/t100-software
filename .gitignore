@@ -1,0 +1,10 @@
+*.o
+commandline/app_basicReadings/t100_basicReadings
+
+commandline/app_basicReadings/temp
+
+commandline/app_interactiveConnection/t100_interactiveConnection
+
+commandline/app_randomSerial/t100_randomSerial
+
+commandline/app_searchDevices/t100_searchDevices
