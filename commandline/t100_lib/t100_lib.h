@@ -15,8 +15,8 @@
 #include "hidapi.h"
 #include "thermocoupleCoefficients.h"
 
-#define VID 0x16c0
-#define PID 0x05df
+#define VID 0x2b51
+#define PID 0x1002
 
 #define MAXIMUM_T100_DEVICES 64
 
