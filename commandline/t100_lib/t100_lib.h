@@ -47,6 +47,14 @@ class t100
   t100();
 
   /**
+   * Disconnect from the current device.
+   *
+   * @param (none)
+   * @return (none)
+   */
+  void disconnect();
+
+  /**
     * Try to connect to first t100 device it could find, without any serial 
     * number matching.
     * 
