@@ -3,7 +3,6 @@
 
 int deviceCount;
 t100 t100_coordinator;
-t100** internalList;
 
 void t100Helper_initHardware()
 {

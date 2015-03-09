@@ -84,7 +84,7 @@ void MainWindow::updateEvent()
     }       
 }
 
-void MainWindow::rescan_pushButton_clicked()
+void MainWindow::on_rescan_pushButton_clicked()
 {
     /* Do the rescan */
     t100Helper_fillDeviceList(t100_list);

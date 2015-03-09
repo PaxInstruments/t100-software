@@ -17,7 +17,7 @@ public:
 
 private slots:    
     void updateEvent();
-    void rescan_pushButton_clicked();
+    void on_rescan_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
