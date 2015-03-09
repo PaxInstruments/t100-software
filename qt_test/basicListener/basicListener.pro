@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = basicListener
 TEMPLATE = app
@@ -19,13 +19,15 @@ macx: LIBS += -framework CoreFoundation -framework IOkit
 
 SOURCES += ../../commandline/t100_lib/t100_lib.cpp \
     t100Helper.cpp \
-    TableModel.cpp
+    TableModel.cpp \
+    qcustomplot/qcustomplot.cpp
 
 SOURCES += main.cpp\
         mainwindow.cpp \
 
 HEADERS  += mainwindow.h \
     t100Helper.h \
-    TableModel.h
+    TableModel.h \
+    qcustomplot/qcustomplot.h
 
 FORMS    += mainwindow.ui
