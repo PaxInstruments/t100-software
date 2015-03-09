@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
+    <width>464</width>
     <height>324</height>
    </rect>
   </property>
@@ -25,7 +25,7 @@
      <rect>
       <x>5</x>
       <y>5</y>
-      <width>451</width>
+      <width>461</width>
       <height>271</height>
      </rect>
     </property>
@@ -38,7 +38,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>441</width>
+        <width>451</width>
         <height>235</height>
        </rect>
       </property>
@@ -62,15 +62,13 @@
      </attribute>
     </widget>
    </widget>
-   <zorder>tabWidget</zorder>
-   <zorder>myTableView</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>460</width>
+     <width>466</width>
      <height>22</height>
     </rect>
    </property>

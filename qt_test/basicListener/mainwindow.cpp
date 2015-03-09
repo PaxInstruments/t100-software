@@ -31,6 +31,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->myTableView->show();
     ui->myTableView->resizeColumnsToContents();
 
+    /* Don't allow resize */
+    this->setFixedSize(this->size());
+
     connect(timer, SIGNAL(timeout()), this, SLOT(updateEvent()));
     timer->start(500);   
 }
