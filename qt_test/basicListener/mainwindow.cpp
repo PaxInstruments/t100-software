@@ -3,9 +3,12 @@
 
 #include "TableModel.h"
 #include "t100Helper.h"
+#include "movAvg.h"
+
 #include <QTabWidget>
 
 QTimer *timer;
+MovAvg graphFilter(8);
 QVector<t100*> t100_list;
 TableModel myTableModel(0);
 
@@ -27,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->tabWidget->setTabText(0,"Reading");
     ui->tabWidget->setTabText(1,"Config");
     ui->tabWidget->setTabText(2,"Graph");
-
     ui->tabWidget->setCurrentIndex(0);
 
     /* Set the model and show */
@@ -51,8 +53,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->myPlot->xAxis->setTickLabelFont(labelFont);
     ui->myPlot->yAxis->setTickLabelFont(labelFont);
 
+    /* Set filter length to 8 for the graph update */
+    graphFilter.setFilterLen(8);
+
+    /* Update timer */
     connect(timer, SIGNAL(timeout()), this, SLOT(updateEvent()));
-    timer->start(300);
+    timer->start(300);       
 }
 
 MainWindow::~MainWindow()
@@ -78,7 +84,7 @@ void MainWindow::updateEvent()
         ui->myPlot->yAxis->setRange(rangeVal.lower - 0.25,rangeVal.upper + 0.25);
 
         /* Add the new data and replot */
-        ui->myPlot->graph(0)->addData(key,t100_list.at(0)->getThermocoupleTemperature());
+        ui->myPlot->graph(0)->addData(key,graphFilter.execute(t100_list.at(0)->getThermocoupleTemperature()));
         ui->myPlot->graph(0)->removeDataBefore(key-150);
         ui->myPlot->replot();
     }       

@@ -20,7 +20,8 @@ macx: LIBS += -framework CoreFoundation -framework IOkit
 SOURCES += ../../commandline/t100_lib/t100_lib.cpp \
     t100Helper.cpp \
     TableModel.cpp \
-    qcustomplot/qcustomplot.cpp
+    qcustomplot/qcustomplot.cpp \
+    movAvg.cpp
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -28,6 +29,7 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h \
     t100Helper.h \
     TableModel.h \
-    qcustomplot/qcustomplot.h
+    qcustomplot/qcustomplot.h \
+    movAvg.h
 
 FORMS    += mainwindow.ui
