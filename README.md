@@ -31,3 +31,10 @@ It is a C++ class which abstracts the hidapi calls and does neccessary raw unit 
 ##How do we calculate the thermocouple temperature?
 
 We are using 9th order polynomial for the conversion. The coefficients for that polynomial are coming from _ITS-90 Thermocouple Database_. Copy of that database file resides at the /docs/ folder. 
+
+## T100 Projects
+
+- [Electronics](https://github.com/PaxInstruments/t100-electronics)
+- [Enclosure](https://github.com/PaxInstruments/t100-enclosure)
+- [Firmware](https://github.com/PaxInstruments/t100-firmware)
+- [Software](https://github.com/PaxInstruments/t100-software)
