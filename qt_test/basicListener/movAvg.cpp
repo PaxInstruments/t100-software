@@ -44,6 +44,10 @@ double MovAvg::execute(double new_input)
 
 void MovAvg::setFilterLen(int len)
 {
+    m_sum = 0;
+    m_index = 0;
+    m_stable = false;
+
     if(len <= 0)
     {
         len = 1;
@@ -52,5 +56,6 @@ void MovAvg::setFilterLen(int len)
     {
         len = m_maxLength;
     }
+
     m_len = len;
 }
