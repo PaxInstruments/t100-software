@@ -20,6 +20,8 @@ t100::t100()
   this->mySerialNumber = -1;
 
   setThermocoupleType(KType);
+
+  this->problem = false;
 }
 /*---------------------------------------------------------------------------*/
 void t100::disconnect()
@@ -33,6 +35,7 @@ int t100::connectBasic()
   
   if(!(this->t100_handle))
   {   
+    this->problem = true;
     return -1;
   } 
   else
@@ -50,6 +53,7 @@ int t100::connectBySerial(int serial)
 
   if(!(this->t100_handle))
   {   
+    this->problem = true;
     return -1;
   } 
   else
@@ -91,6 +95,7 @@ int t100::getSerialNumber(uint8_t arrayIndex)
 {
   if(arrayIndex >= t100_totalDevices)
   {
+    this->problem = true;
     return -1;
   }
   else
@@ -120,6 +125,7 @@ int t100::sendData(uint8_t* buf, uint8_t len)
 
   if(rval < 0)
   {
+    this->problem = true;
     return -1;
   }
 
@@ -138,6 +144,7 @@ int t100::readData(uint8_t* buf,uint8_t len)
 
   if(rval < 0)
   {
+    this->problem = true;
     return -1;
   }
   
@@ -160,6 +167,7 @@ int t100::periodicUpdate()
 
   if(rval < 0)
   {  
+    this->problem = true;
     return -1;
   }   
 
@@ -172,6 +180,12 @@ int t100::periodicUpdate()
   }
 
   return 0;
+}
+/*---------------------------------------------------------------------------*/
+bool t100::alive()
+{
+    bool alive = not this->problem;
+    return alive;
 }
 /*---------------------------------------------------------------------------*/
 float t100::getColdJunctionTemperature()
@@ -250,6 +264,7 @@ int t100::setPgaGain(uint8_t gain)
 
   if(rval < 0)
   {  
+    this->problem = true;
     return -1;
   }
 

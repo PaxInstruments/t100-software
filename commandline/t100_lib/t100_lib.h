@@ -24,6 +24,8 @@ class t100
 {
   private:  
 
+  bool problem;
+
   int mcp3421_pgaSet;
 
   int mySerialNumber;
@@ -124,6 +126,14 @@ class t100
     * @return 0 for success and -1 for error
     */
   int periodicUpdate();
+
+  /**
+    * Use this to check whether device is connected.
+    *
+    * @param (none)
+    * @return Connection health status
+    */
+  bool isAlive();
 
   /**
     * Use this to check the MCP9800 temperature data
