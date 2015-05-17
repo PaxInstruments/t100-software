@@ -16,6 +16,17 @@ MovAvg::MovAvg(int len)
     m_stable = false;
 }
 
+void MovAvg::reset()
+{
+    m_sum = 0;
+    m_index = 0;
+    m_stable = false;
+    for(int i=0;i<m_maxLength;i++)
+    {
+        m_dataArray[i] = 0x00;
+    }
+}
+
 double MovAvg::execute(double new_input)
 {
     double filter_out;

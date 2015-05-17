@@ -8,29 +8,33 @@
 #include <QTabWidget>
 
 QTimer *timer;
+QFile m_logFile;
+bool m_logRunning;
+QTimer *timer_1sec;
+QDateTime logStart;
 MovAvg graphFilter(8);
 QVector<t100*> t100_list;
 TableModel myTableModel(0);
 
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     timer = new QTimer(this);
+    timer_1sec = new QTimer(this);
+
     ui->setupUi(this);
 
     /* Call this at the start once */
     t100Helper_initHardware();
 
     /* Do the initial scan */
-    t100Helper_fillDeviceList(t100_list);
+    t100Helper_fillDeviceList(t100_list);   
 
     /* Set the data source */
     myTableModel.setDeviceList(t100_list);
     myTableModel.setCurrentRowCounts();
 
-    ui->tabWidget->setTabText(0,"Reading");
-    ui->tabWidget->setTabText(1,"Config");
-    ui->tabWidget->setTabText(2,"Graph");
-    ui->tabWidget->setCurrentIndex(0);
+    ui->tabWidget->setCurrentIndex(0);    
 
     /* Set the model and show */
     ui->myTableView->setModel(&myTableModel);
@@ -56,14 +60,59 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     /* Set filter length to 8 for the graph update */
     graphFilter.setFilterLen(8);
 
+    for(int i=0;i<t100Helper_getDeviceCount();i++)
+    {
+        ui->logTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+        ui->graphTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+    }
+
+    ui->logTab_comboBox->setCurrentIndex(0);
+    ui->graphTab_comboBox->setCurrentIndex(0);
+
+    /* Log UI settings */
+    ui->logTab_lcdNumber->display("00:00:00");
+    ui->logTab_textEdit->moveCursor (QTextCursor::End);
+    ui->logTab_textEdit->insertPlainText ("Ready ...\n");
+    ui->logTab_textEdit->moveCursor (QTextCursor::End);
+
+    m_logRunning = false;
+
     /* Update timer */
     connect(timer, SIGNAL(timeout()), this, SLOT(updateEvent()));
-    timer->start(300);       
+    timer->start(300);
+
+    /* Log counter timer */
+    connect(timer_1sec, SIGNAL(timeout()), this, SLOT(timer1sec_event()));
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::handleLogEvent()
+{
+    if(m_logRunning)
+    {
+        QTextStream out(&m_logFile);
+        int deviceIndex = ui->logTab_comboBox->currentIndex();
+        QString timeData = QDateTime::currentDateTime().toString("hh:mm:ss,dd:MM:yyyy");
+        float value = t100_list.at(deviceIndex)->getThermocoupleTemperature();
+
+        out << timeData + "," + QString::number(value) + "\n" ;
+    }
+}
+
+void MainWindow::timer1sec_event()
+{
+    int diff_ms;
+    QTime diff_time(0,0,0);
+    timer_1sec->start(1000);
+
+    diff_ms = QDateTime::currentDateTime().toMSecsSinceEpoch() - logStart.toMSecsSinceEpoch();
+    diff_time = diff_time.addMSecs(diff_ms);
+    ui->logTab_lcdNumber->display(diff_time.toString("hh:mm:ss"));
 }
 
 void MainWindow::updateEvent()
@@ -73,28 +122,107 @@ void MainWindow::updateEvent()
     double key = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000.0;
 
     if(t100Helper_getDeviceCount() > 0)
-    {
+    {        
         myTableModel.updateData();
 
-        ui->myTableView->resizeColumnsToContents();
+        handleLogEvent();
 
-        /* Do the rescaling and add +- 0.25 offset to the Y axis of the graph */
-        ui->myPlot->rescaleAxes();        
-        QCPRange rangeVal = ui->myPlot->yAxis->range();
-        ui->myPlot->yAxis->setRange(rangeVal.lower - 0.25,rangeVal.upper + 0.25);
+        int deviceIndex = ui->graphTab_comboBox->currentIndex();
 
-        /* Add the new data and replot */
-        ui->myPlot->graph(0)->addData(key,graphFilter.execute(t100_list.at(0)->getThermocoupleTemperature()));
-        ui->myPlot->graph(0)->removeDataBefore(key-150);
-        ui->myPlot->replot();
+        if(t100_list.at(deviceIndex)->isAlive())
+        {
+            double temperature = t100_list.at(deviceIndex)->getThermocoupleTemperature();
+
+            ui->myTableView->resizeColumnsToContents();
+
+            /* Do the rescaling and add +- 0.25 offset to the Y axis of the graph */
+            ui->myPlot->rescaleAxes();
+            QCPRange rangeVal = ui->myPlot->yAxis->range();
+            ui->myPlot->yAxis->setRange(rangeVal.lower - 0.25,rangeVal.upper + 0.25);
+
+            /* Add the new data and replot */
+            ui->myPlot->graph(0)->addData(key,graphFilter.execute(temperature));
+            ui->myPlot->graph(0)->removeDataBefore(key-150);
+            ui->myPlot->replot();
+
+            ui->logTab_statusLabel->setText("Status: Plotting ...");
+            ui->logTab_lastReadLabel->setText("Last read: " + QString::number(temperature));
+        }
+        else
+        {
+            ui->logTab_statusLabel->setText("Status: Device disconnected?");
+        }
     }       
 }
 
 void MainWindow::on_rescan_pushButton_clicked()
-{
+{    
     /* Do the rescan */
     t100Helper_fillDeviceList(t100_list);
 
     /* Update row counts based on new devices */
     myTableModel.updateRowCounts();
+
+    ui->logTab_comboBox->clear();
+    ui->graphTab_comboBox->clear();
+
+    for(int i=0;i<t100Helper_getDeviceCount();i++)
+    {
+        ui->logTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+        ui->graphTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+    }
+}
+
+void MainWindow::on_logTab_radioButton_2_toggled(bool checked)
+{
+    ui->logTab_comboBox->setEnabled(checked);
+}
+
+void MainWindow::on_graphTab_comboBox_currentIndexChanged(int index)
+{
+    graphFilter.reset();
+    ui->myPlot->graph(0)->clearData();
+}
+
+void MainWindow::on_logTab_pushButton_clicked()
+{
+    if(m_logRunning)
+    {
+        m_logFile.close();
+        m_logRunning = false;
+        timer_1sec->stop();
+        ui->logTab_textEdit->moveCursor (QTextCursor::End);
+        ui->logTab_textEdit->insertPlainText ("Log ended.\n");
+        ui->logTab_textEdit->moveCursor (QTextCursor::End);
+        ui->logTab_pushButton->setText("Start Logging");
+    }
+    else
+    {
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
+                                   "T100_log_" + QDateTime::currentDateTime().toString("hh.mm.ss_dd.MM.yyyy"),
+                                   "Text files (*.txt)");
+
+        m_logFile.setFileName(fileName);
+
+        if(!m_logFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        {
+            ui->logTab_textEdit->moveCursor (QTextCursor::End);
+            ui->logTab_textEdit->insertPlainText ("File I/O problem!\n");
+            ui->logTab_textEdit->moveCursor (QTextCursor::End);
+        }
+        else
+        {
+            m_logRunning = true;
+
+            ui->logTab_textEdit->moveCursor (QTextCursor::End);
+            ui->logTab_textEdit->insertPlainText ("Log started.\n");
+            ui->logTab_textEdit->moveCursor (QTextCursor::End);
+            ui->logTab_pushButton->setText("Stop Logging");
+
+            ui->logTab_lcdNumber->display("00:00:00");
+            logStart = QDateTime::currentDateTime();
+
+            timer_1sec->start(1000);
+        }
+    }
 }

@@ -17,7 +17,12 @@ public:
 
 private slots:    
     void updateEvent();
+    void handleLogEvent();
+    void timer1sec_event();
     void on_rescan_pushButton_clicked();
+    void on_logTab_pushButton_clicked();
+    void on_logTab_radioButton_2_toggled(bool checked);
+    void on_graphTab_comboBox_currentIndexChanged(int index);
 
 private:
     Ui::MainWindow *ui;

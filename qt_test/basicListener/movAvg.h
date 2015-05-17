@@ -7,6 +7,7 @@ class MovAvg
 {
     public:
         MovAvg(int len);
+        void reset();
         void setFilterLen(int len);
         double execute(double new_input);
 
