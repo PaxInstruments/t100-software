@@ -182,7 +182,7 @@ int t100::periodicUpdate()
   return 0;
 }
 /*---------------------------------------------------------------------------*/
-bool t100::alive()
+bool t100::isAlive()
 {
     bool alive = not this->problem;
     return alive;
