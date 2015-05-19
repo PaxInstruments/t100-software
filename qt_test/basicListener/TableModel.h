@@ -19,11 +19,13 @@ class TableModel : public QAbstractTableModel
         void updateData();
         void updateRowCounts();
         void setCurrentRowCounts();
+        void setCurrentColumnCounts(int columnCount);
         void setDeviceList(QVector<t100*> &deviceList);
 
     private:        
         QVector<t100*> *m_deviceList;
         int m_currentRowCount;
+        int m_currentColumnCount;
 };
 
 #endif // MAINWINDOW_H

@@ -15,7 +15,7 @@ QDateTime logStart;
 MovAvg graphFilter(8);
 QVector<t100*> t100_list;
 TableModel myTableModel(0);
-
+int m_plotHistoryLength;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -33,13 +33,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     /* Set the data source */
     myTableModel.setDeviceList(t100_list);
     myTableModel.setCurrentRowCounts();
+    myTableModel.setCurrentColumnCounts(3);
 
     ui->tabWidget->setCurrentIndex(0);    
 
     /* Set the model and show */
     ui->myTableView->setModel(&myTableModel);
-    ui->myTableView->show();
+    ui->myTableView->show();    
     ui->myTableView->resizeColumnsToContents();
+    ui->myTableView->resizeRowsToContents();
+    ui->myTableView->horizontalHeader()->setStretchLastSection(true);
 
     /* Don't allow resize */
     this->setFixedSize(this->size());
@@ -76,6 +79,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->logTab_textEdit->moveCursor (QTextCursor::End);
 
     m_logRunning = false;
+    m_plotHistoryLength = 150;
 
     /* Update timer */
     connect(timer, SIGNAL(timeout()), this, SLOT(updateEvent()));
@@ -123,6 +127,8 @@ void MainWindow::updateEvent()
 
     if(t100Helper_getDeviceCount() > 0)
     {        
+        t100Helper_periodicUpdate(t100_list);
+
         myTableModel.updateData();
 
         handleLogEvent();
@@ -134,6 +140,8 @@ void MainWindow::updateEvent()
             double temperature = t100_list.at(deviceIndex)->getThermocoupleTemperature();
 
             ui->myTableView->resizeColumnsToContents();
+            ui->myTableView->resizeRowsToContents();
+            ui->myTableView->horizontalHeader()->setStretchLastSection(true);
 
             /* Do the rescaling and add +- 0.25 offset to the Y axis of the graph */
             ui->myPlot->rescaleAxes();
@@ -142,7 +150,7 @@ void MainWindow::updateEvent()
 
             /* Add the new data and replot */
             ui->myPlot->graph(0)->addData(key,graphFilter.execute(temperature));
-            ui->myPlot->graph(0)->removeDataBefore(key-150);
+            ui->myPlot->graph(0)->removeDataBefore(key-m_plotHistoryLength);
             ui->myPlot->replot();
 
             ui->logTab_statusLabel->setText("Status: Plotting ...");
@@ -225,4 +233,71 @@ void MainWindow::on_logTab_pushButton_clicked()
             timer_1sec->start(1000);
         }
     }
+}
+
+void MainWindow::on_config_fahr_radioButton_toggled(bool checked)
+{
+    if(checked)
+    {
+        for(int i=0;i<t100Helper_getDeviceCount();i++)
+        {
+            t100_list.at(i)->setTemperatureUnit(T100_FAHRENHEIT);
+        }
+
+    }
+}
+
+void MainWindow::on_config_kelvin_radioButton_toggled(bool checked)
+{
+    if(checked)
+    {
+        for(int i=0;i<t100Helper_getDeviceCount();i++)
+        {
+            t100_list.at(i)->setTemperatureUnit(T100_KELVIN);
+        }
+
+    }
+}
+
+void MainWindow::on_config_celcius_radioButton_toggled(bool checked)
+{
+    if(checked)
+    {
+        for(int i=0;i<t100Helper_getDeviceCount();i++)
+        {
+            t100_list.at(i)->setTemperatureUnit(T100_CELCIUS);
+        }
+
+    }
+}
+
+void MainWindow::on_config_showADC_checkBox_toggled(bool checked)
+{
+    if(checked)
+    {
+        myTableModel.setCurrentColumnCounts(4);
+        ui->myTableView->resizeColumnsToContents();
+        ui->myTableView->resizeRowsToContents();
+        ui->myTableView->horizontalHeader()->setStretchLastSection(true);
+
+    }
+    else
+    {
+        myTableModel.setCurrentColumnCounts(3);
+        ui->myTableView->resizeColumnsToContents();
+        ui->myTableView->resizeRowsToContents();
+        ui->myTableView->horizontalHeader()->setStretchLastSection(true);
+    }
+}
+
+void MainWindow::on_config_movAvg_spinBox_valueChanged(int arg1)
+{
+    /* Set filter length to 8 for the graph update */
+    graphFilter.setFilterLen(arg1);
+}
+
+void MainWindow::on_config_movAvg_spinBox_2_valueChanged(int arg1)
+{
+    m_plotHistoryLength = arg1;
+    ui->myPlot->graph(0)->clearData();
 }

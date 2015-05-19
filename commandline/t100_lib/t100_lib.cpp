@@ -6,11 +6,13 @@
 /----------------------------------------------------------------------------*/
 #include "t100_lib.h"
 /*---------------------------------------------------------------------------*/
-uint8_t tempBuffer[256];
-uint8_t internalBuffer[32];
-/*---------------------------------------------------------------------------*/
 t100::t100()
 { 
+
+}
+/*---------------------------------------------------------------------------*/
+void t100::init()
+{
   this->t100_handle = NULL;
 
   this->t100_totalDevices = 0;
@@ -22,6 +24,8 @@ t100::t100()
   setThermocoupleType(KType);
 
   this->problem = false;
+
+  this->temperatureUnit = T100_CELCIUS;
 }
 /*---------------------------------------------------------------------------*/
 void t100::disconnect()
@@ -185,7 +189,22 @@ int t100::periodicUpdate()
 bool t100::isAlive()
 {
     bool alive = not this->problem;
+
     return alive;
+}
+/*---------------------------------------------------------------------------*/
+float t100::getColdJunctionTemperature_celsius()
+{
+  int16_t tmp16;
+  float temperature;
+
+  /* Convert raw data to celsius */
+  /* TODO: Add additional eq function */
+  tmp16 = (internalBuffer[5] << 8) | internalBuffer[6];
+  tmp16 = tmp16 >> 4;
+  temperature = tmp16 * 0.0625;
+
+  return temperature;
 }
 /*---------------------------------------------------------------------------*/
 float t100::getColdJunctionTemperature()
@@ -199,7 +218,36 @@ float t100::getColdJunctionTemperature()
   tmp16 = tmp16 >> 4;
   temperature = tmp16 * 0.0625;
 
-  return temperature;
+  /* Return the temperature value in correct unit */
+  if(this->temperatureUnit == T100_CELCIUS)
+  {
+    return temperature;
+  }
+  else if(this->temperatureUnit == T100_KELVIN)
+  {
+    return celsiusToKelvin(temperature);
+  }
+  else if(this->temperatureUnit == T100_FAHRENHEIT)
+  {
+    return celsiusToFahreneit(temperature);
+  }
+  else
+  {
+    return 99999.0; /* error ... */
+  }
+}
+/*---------------------------------------------------------------------------*/
+int t100::setTemperatureUnit(int type)
+{
+  if(type < 3)
+  {
+    this->temperatureUnit = type;
+    return 0;
+  }
+  else
+  {
+    return -1;
+  }
 }
 /*---------------------------------------------------------------------------*/
 float t100::getAdcVoltage()
@@ -281,6 +329,24 @@ int t100::setThermocoupleType(int type)
   return 0;
 }
 /*---------------------------------------------------------------------------*/
+float t100::celsiusToFahreneit(float tCelcius)
+{
+  float tReturn;
+
+  tReturn = ((tCelcius * 9.0)/5.0) + 32;
+
+  return tReturn;   
+}
+/*---------------------------------------------------------------------------*/
+float t100::celsiusToKelvin(float tCelcius)
+{
+  float tReturn;
+
+  tReturn = tCelcius + 273;
+
+  return tReturn;   
+}
+/*---------------------------------------------------------------------------*/
 float t100::getThermocoupleTemperature()
 {
   float temperature;
@@ -295,7 +361,6 @@ float t100::getThermocoupleTemperature()
   partialGroupCount = ThermoCoeffArray[this->thermocoupleTypeInd].partialCoeffCount;
 
   /* Let's get the current thermocouple voltage */
-  periodicUpdate();
   thermocouple_mv = getAdcVoltage();
 
   /* Let's check the boundaries of the current thermocouple data type */
@@ -324,12 +389,23 @@ float t100::getThermocoupleTemperature()
   }
 
   /* Calculate the polynomial result */
-  temperature = getColdJunctionTemperature();
+  temperature = getColdJunctionTemperature_celsius();
   temperature += partialCoeff.coeff[0];
   for(int i=1; i<10; i++)
   {
     temperature += partialCoeff.coeff[i] * pow(thermocouple_mv,i);
   }
 
+  /* Convert the temperature if neccessary */
+  if(this->temperatureUnit == T100_KELVIN)
+  {
+    temperature = celsiusToKelvin(temperature);
+  }
+  else if(this->temperatureUnit == T100_FAHRENHEIT)
+  {
+    temperature = celsiusToFahreneit(temperature);
+  }
+
   return temperature;
 }
+/*---------------------------------------------------------------------------*/

@@ -24,6 +24,18 @@ private slots:
     void on_logTab_radioButton_2_toggled(bool checked);
     void on_graphTab_comboBox_currentIndexChanged(int index);
 
+    void on_config_fahr_radioButton_toggled(bool checked);
+
+    void on_config_kelvin_radioButton_toggled(bool checked);
+
+    void on_config_celcius_radioButton_toggled(bool checked);
+
+    void on_config_showADC_checkBox_toggled(bool checked);
+
+    void on_config_movAvg_spinBox_valueChanged(int arg1);
+
+    void on_config_movAvg_spinBox_2_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
 };

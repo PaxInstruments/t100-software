@@ -17,7 +17,7 @@ typedef struct
 {
   double mV_LOW;    /* Starting voltage for a curve */
   double mV_HIGH;   /* Ending voltage for a curve */
-  double coeff[10];  /* Coefficients: 0 = constant, 1 = 1st order, 2 = 2nd order, ... */
+  double coeff[10]; /* Coefficients: 0 = constant, 1 = 1st order, 2 = 2nd order, ... */
 } TCCOEF_TYPEDEF;   /* Polynomial curves */
 /*---------------------------------------------------------------------------*/
 const int K_Coeff_len = 3;

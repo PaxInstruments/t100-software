@@ -46,11 +46,36 @@ int TableModel::rowCount(const QModelIndex &parent) const
     return t100Helper_getDeviceCount();
 }
 
+void TableModel::setCurrentColumnCounts(int columnCount)
+{
+    bool removed = false;
+
+    if(m_currentColumnCount > columnCount)
+    {
+        removed = true;
+    }
+
+    m_currentColumnCount = columnCount;
+
+    if(removed)
+    {
+        beginRemoveColumns(QModelIndex(),0,0);
+        removeColumn(m_currentColumnCount-1);
+        endRemoveColumns();
+    }
+    else
+    {
+        beginInsertColumns(QModelIndex(),0,0);
+        insertColumn(m_currentColumnCount-1);
+        endInsertColumns();
+    }
+}
+
 int TableModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
       
-    return 4;
+    return m_currentColumnCount;
 }
 
 QVariant TableModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -68,17 +93,17 @@ QVariant TableModel::headerData(int section, Qt::Orientation orientation, int ro
             }
             case 1: /* Cold Junction Temperature */
             {
-                tmp = "Cold Junction (°C)";
+                tmp = "Cold Junction";
                 break;
             }
-            case 2: /* Thermocouple Temperature (°C)*/
+            case 2: /* Thermocouple Temperature*/
             {
-                tmp = "Thermocouple (°C)";
+                tmp = "Thermocouple";
                 break;
             }
             case 3: /* Raw ADC reading */
             {
-                tmp = "ADC Reading (mV)";
+                tmp = "ADC (mV)";
                 break;
             }
         }

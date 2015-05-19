@@ -39,7 +39,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -95,7 +95,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QRadioButton" name="radioButton">
+         <widget class="QRadioButton" name="config_celcius_radioButton">
           <property name="text">
            <string>Celcius</string>
           </property>
@@ -105,14 +105,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_3">
+         <widget class="QRadioButton" name="config_kelvin_radioButton">
           <property name="text">
            <string>Kelvin</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="radioButton_2">
+         <widget class="QRadioButton" name="config_fahr_radioButton">
           <property name="text">
            <string>Fahrenheit</string>
           </property>
@@ -127,7 +127,7 @@
         <x>140</x>
         <y>10</y>
         <width>121</width>
-        <height>51</height>
+        <height>61</height>
        </rect>
       </property>
       <property name="title">
@@ -137,11 +137,102 @@
        <property name="geometry">
         <rect>
          <x>3</x>
-         <y>23</y>
+         <y>30</y>
          <width>111</width>
          <height>26</height>
         </rect>
        </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="geometry">
+       <rect>
+        <x>270</x>
+        <y>10</y>
+        <width>171</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Advanced</string>
+      </property>
+      <widget class="QCheckBox" name="config_showADC_checkBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>171</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Show ADC readings</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>120</y>
+        <width>261</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Graph</string>
+      </property>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>241</width>
+         <height>60</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Moving avg filter length:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="config_movAvg_spinBox">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>32</number>
+          </property>
+          <property name="value">
+           <number>8</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Plot history (units)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="config_movAvg_spinBox_2">
+          <property name="minimum">
+           <number>100</number>
+          </property>
+          <property name="maximum">
+           <number>1000</number>
+          </property>
+          <property name="value">
+           <number>150</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </widget>

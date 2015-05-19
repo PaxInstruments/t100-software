@@ -21,6 +21,14 @@ t100* createT100()
     return pt;
 }
 
+void t100Helper_periodicUpdate(QVector<t100*> &deviceList)
+{
+    for(int i=0;i<deviceCount;i++)
+    {
+        deviceList.at(i)->periodicUpdate();
+    }
+}
+
 void t100Helper_fillDeviceList(QVector<t100*> &deviceList)
 {
     int rval;
@@ -41,6 +49,8 @@ void t100Helper_fillDeviceList(QVector<t100*> &deviceList)
     for(int i=0;i<deviceCount;i++)
     {
         t100* tmp = createT100();
+
+        tmp->init();
 
         rval = tmp->connectBySerial(t100_coordinator.getSerialNumber(i));
 

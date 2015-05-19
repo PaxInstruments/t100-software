@@ -59,6 +59,11 @@ void MovAvg::setFilterLen(int len)
     m_index = 0;
     m_stable = false;
 
+    for(int i=0;i<m_maxLength;i++)
+    {
+        m_dataArray[i] = 0x00;
+    }
+
     if(len <= 0)
     {
         len = 1;

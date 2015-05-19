@@ -20,15 +20,20 @@
 
 #define MAXIMUM_T100_DEVICES 64
 
+#define T100_KELVIN 0
+#define T100_CELCIUS 1
+#define T100_FAHRENHEIT 2
+
 class t100
 {
-  private:  
 
   bool problem;
 
   int mcp3421_pgaSet;
 
   int mySerialNumber;
+
+  int temperatureUnit;
   
   int t100_totalDevices;
 
@@ -36,7 +41,37 @@ class t100
 
   int thermocoupleTypeInd;
 
-  int t100_deviceSerials[MAXIMUM_T100_DEVICES];   
+  int t100_deviceSerials[MAXIMUM_T100_DEVICES];
+
+  uint8_t tempBuffer[256];
+
+  uint8_t internalBuffer[32];
+
+  private:
+
+  /**
+   * Private method for Celsius to Kelvin conversion
+   *
+   * @param Temperature in Celcius
+   * @return Temperature in Kelvin
+   */
+  float celsiusToKelvin(float tCelcius);
+
+  /**
+   * Private method for Celsius to Fahreneit conversion
+   *
+   * @param Temperature in Celcius
+   * @return Temperature in Fahreneit
+   */
+  float celsiusToFahreneit(float tCelcius);
+
+  /**
+    * Use this to check the MCP9800 temperature data
+    *
+    * @param (none)
+    * @return Cold junction temperature value in celsius
+    */
+  float getColdJunctionTemperature_celsius();
 
   public:
   
@@ -47,6 +82,14 @@ class t100
    * @return (none)
    */
   t100();
+
+  /**
+   * Initialise member variables
+   *
+   * @param (none)
+   * @return (none)
+   */
+  void init();
 
   /**
    * Disconnect from the current device.
@@ -169,6 +212,14 @@ class t100
     * @return 0 for success and -1 for wrong thermocouple type.
     */
   int setThermocoupleType(int type);
+
+    /**
+    * Sets the temperature unit.
+    *
+    * @param type Temperature unit
+    * @return 0 for success and -1 for wrong thermocouple type.
+    */
+  int setTemperatureUnit(int type);
 
   /**
     * Main end-user function. Use this to query the temperature of the thermocouple. 
