@@ -144,7 +144,7 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
                {
                     double temperature = currentDevice->getThermocoupleTemperature();
 
-                    if(temperature == T100_TEMP_MIN)
+                    if(temperature == T100_TEMP_MAX)
                     {
                         tmp = "Highest!";
                     }
