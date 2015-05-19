@@ -48,10 +48,10 @@ int t100::connectBasic()
   }
 }
 /*---------------------------------------------------------------------------*/
-int t100::connectBySerial(int serial)
+int t100::connectBySerial(uint64_t serial)
 {
   wchar_t buf[16];
-  swprintf(buf, sizeof(buf) / sizeof(*buf), L"%d", serial);
+  swprintf(buf, sizeof(buf) / sizeof(*buf), L"%lu", serial);
 
   this->t100_handle = hid_open(VID, PID, buf);
 
@@ -67,7 +67,7 @@ int t100::connectBySerial(int serial)
   }
 }
 /*---------------------------------------------------------------------------*/
-int t100::getMySerialNumber()
+uint64_t t100::getMySerialNumber()
 {
     return this->mySerialNumber;
 }
@@ -95,7 +95,7 @@ int t100::searchDevices()
   return t100_totalDevices;
 }
 /*---------------------------------------------------------------------------*/
-int t100::getSerialNumber(uint8_t arrayIndex)
+uint64_t t100::getSerialNumber(uint8_t arrayIndex)
 {
   if(arrayIndex >= t100_totalDevices)
   {

@@ -34,17 +34,17 @@ class t100
 
   int mcp3421_pgaSet;
 
-  int mySerialNumber;
-
   int temperatureUnit;
   
   int t100_totalDevices;
 
-  hid_device* t100_handle;  
+  uint64_t mySerialNumber;
+
+  hid_device* t100_handle;
 
   int thermocoupleTypeInd;
 
-  int t100_deviceSerials[MAXIMUM_T100_DEVICES];
+  uint64_t t100_deviceSerials[MAXIMUM_T100_DEVICES];
 
   uint8_t tempBuffer[256];
 
@@ -117,7 +117,7 @@ class t100
     * @param serial Specific serial number you want 
     * @return 0 for success and -1 for error
     */
-  int connectBySerial(int serial);
+  int connectBySerial(uint64_t serial);
 
   /**
     * Search t100 devices around USB bus and fill t100_deviceSerials array.
@@ -134,7 +134,7 @@ class t100
     * @return Serial number of the device. If there isn't any device serial 
     * at that location, function returns -1
     */
-  int getSerialNumber(uint8_t arrayIndex);
+  uint64_t getSerialNumber(uint8_t arrayIndex);
 
   /**
     * Use this for personal identificaiton.
@@ -143,7 +143,7 @@ class t100
     * @return Serial number of the currently connected device. If there is no 
     * connection, function returns -1
     */
-  int getMySerialNumber();
+  uint64_t getMySerialNumber();
 
   /**
     * Low level data sending function
