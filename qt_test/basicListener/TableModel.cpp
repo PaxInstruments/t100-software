@@ -142,7 +142,20 @@ QVariant TableModel::data(const QModelIndex &index, int role) const
                }
                case 2: /* Thermocouple Temperature */
                {
-                    tmp = QString::number(currentDevice->getThermocoupleTemperature());
+                    double temperature = currentDevice->getThermocoupleTemperature();
+
+                    if(temperature == T100_TEMP_MIN)
+                    {
+                        tmp = "Highest!";
+                    }
+                    else if(temperature == T100_TEMP_MIN)
+                    {
+                        tmp = "Lowest!";
+                    }
+                    else
+                    {
+                        tmp = QString::number(temperature);
+                    }
                     break;
                }
                case 3: /* Raw ADC reading */

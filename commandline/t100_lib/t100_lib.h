@@ -24,6 +24,9 @@
 #define T100_CELCIUS 1
 #define T100_FAHRENHEIT 2
 
+#define T100_TEMP_MAX 999999
+#define T100_TEMP_MIN -999999
+
 class t100
 {
 

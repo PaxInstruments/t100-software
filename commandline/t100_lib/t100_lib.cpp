@@ -367,12 +367,12 @@ float t100::getThermocoupleTemperature()
   if(thermocouple_mv < currentCoeffs[0].mV_LOW)
   {
     /* Our current TC voltage is lower than the lowest */
-    return -999.0;
+    return T100_TEMP_MIN;
   }
   else if(thermocouple_mv > currentCoeffs[(partialGroupCount-1)].mV_HIGH)
   {
     /* Our current TC voltage is higher than the highest */
-    return 999.0;
+    return T100_TEMP_MAX;
   }
 
   /* OK, we are in limits but which partial group should we use? */
