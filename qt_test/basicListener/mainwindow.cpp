@@ -101,10 +101,15 @@ void MainWindow::handleLogEvent()
     {
         QTextStream out(&m_logFile);
         int deviceIndex = ui->logTab_comboBox->currentIndex();
-        QString timeData = QDateTime::currentDateTime().toString("hh:mm:ss,dd:MM:yyyy");
+        QString timeData = QDateTime::currentDateTime().toString("dd:MM:yyyy,hh:mm:ss:zzz");
         float value = t100_list.at(deviceIndex)->getThermocoupleTemperature();
 
         out << timeData + "," + QString::number(value) + "\n" ;
+
+        ui->logTab_textEdit->moveCursor (QTextCursor::End);
+        ui->logTab_textEdit->insertPlainText (timeData + "," + QString::number(value) + "\n");
+        ui->logTab_textEdit->moveCursor (QTextCursor::End);
+
     }
 }
 
@@ -229,6 +234,12 @@ void MainWindow::on_logTab_pushButton_clicked()
 
             ui->logTab_lcdNumber->display("00:00:00");
             logStart = QDateTime::currentDateTime();
+
+            QTextStream out(&m_logFile);
+            int deviceIndex = ui->logTab_comboBox->currentIndex();
+
+            out << "/ *Some informative text about hardware/software version */\n";
+            out << "Date,Time,T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">\n";
 
             timer_1sec->start(1000);
         }
