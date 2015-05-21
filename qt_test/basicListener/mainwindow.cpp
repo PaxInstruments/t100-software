@@ -12,6 +12,8 @@ QFile m_logFile;
 bool m_logRunning;
 QTimer *timer_1sec;
 QDateTime logStart;
+bool logADC = false;
+bool logColdJunction = false;
 MovAvg graphFilter(8);
 QVector<t100*> t100_list;
 TableModel myTableModel(0);
@@ -99,15 +101,36 @@ void MainWindow::handleLogEvent()
 {
     if(m_logRunning)
     {
+        QString logText;
         QTextStream out(&m_logFile);
         int deviceIndex = ui->logTab_comboBox->currentIndex();
         QString timeData = QDateTime::currentDateTime().toString("dd:MM:yyyy,hh:mm:ss:zzz");
-        float value = t100_list.at(deviceIndex)->getThermocoupleTemperature();
 
-        out << timeData + "," + QString::number(value) + "\n" ;
+        float t_tmp = t100_list.at(deviceIndex)->getThermocoupleTemperature();
+        float j_tmp = t100_list.at(deviceIndex)->getColdJunctionTemperature();
+        float adc_mv = t100_list.at(deviceIndex)->getAdcVoltage();
+
+        if(logADC && logColdJunction)
+        {
+            logText = timeData + "," + QString::number(t_tmp) + "," + QString::number(j_tmp) + "," + QString::number(adc_mv) + "\n";
+        }
+        else if(logADC)
+        {
+            logText = timeData + "," + QString::number(t_tmp) + "," + QString::number(adc_mv) + "\n";
+        }
+        else if(logColdJunction)
+        {
+            logText = timeData + "," + QString::number(t_tmp) + "," + QString::number(j_tmp) + "\n";
+        }
+        else
+        {
+            logText = timeData + "," + QString::number(t_tmp) + "\n";
+        }
+
+        out << logText;
 
         ui->logTab_textEdit->moveCursor (QTextCursor::End);
-        ui->logTab_textEdit->insertPlainText (timeData + "," + QString::number(value) + "\n");
+        ui->logTab_textEdit->insertPlainText (logText);
         ui->logTab_textEdit->moveCursor (QTextCursor::End);
 
     }
@@ -238,8 +261,36 @@ void MainWindow::on_logTab_pushButton_clicked()
             QTextStream out(&m_logFile);
             int deviceIndex = ui->logTab_comboBox->currentIndex();
 
+            logADC = ui->config_logADC_checkBox->isChecked();
+            logColdJunction = ui->config_logColdJunction_checkBox->isChecked();
+
             out << "/ *Some informative text about hardware/software version */\n";
-            out << "Date,Time,T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">\n";
+            out << "Date,Time,";
+
+            if(logADC && logColdJunction)
+            {
+                out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">,";
+                out << "JT<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">,";
+                out << "ADC<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                out << "\n";
+            }
+            else if(logADC)
+            {
+                out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">,";
+                out << "ADC<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                out << "\n";
+            }
+            else if(logColdJunction)
+            {
+                out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">,";
+                out << "JT<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                out << "\n";
+            }
+            else
+            {
+                out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                out << "\n";
+            }
 
             timer_1sec->start(1000);
         }
