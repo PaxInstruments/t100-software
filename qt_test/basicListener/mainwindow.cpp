@@ -251,6 +251,12 @@ void MainWindow::on_logTab_pushButton_clicked()
         }
         else
         {
+            bool ok;
+
+            QString logMessage = QInputDialog::getText(this, tr("Log Message"),
+                                                    tr("Log message:"), QLineEdit::Normal,
+                                                    "...", &ok);
+
             m_logRunning = true;
 
             ui->logTab_textEdit->moveCursor (QTextCursor::End);
@@ -282,7 +288,8 @@ void MainWindow::on_logTab_pushButton_clicked()
             }
 
 
-            out << "/ *Some informative text about hardware/software version */\n";
+            out << "[Log message]: " + logMessage + "\n";
+            out << "/ *Some informative text about hardware/software version */\n";           
             out << "YYYY-MM-DDThh:mm:ss.sss, ";
 
             if(logADC && logColdJunction)
