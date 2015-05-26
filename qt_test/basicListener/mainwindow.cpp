@@ -1,11 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include "movAvg.h"
+#include <QTabWidget>
 #include "TableModel.h"
 #include "t100Helper.h"
-#include "movAvg.h"
-
-#include <QTabWidget>
+#include <QStandardPaths>
 
 QTimer *timer;
 QFile m_logFile;
@@ -234,8 +233,10 @@ void MainWindow::on_logTab_pushButton_clicked()
     }
     else
     {
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),
-                                   "T100_log_" + QDateTime::currentDateTime().toString("hh.mm.ss_dd.MM.yyyy"),
+        QStringList documentLocations = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation);
+
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),documentLocations.first() +
+                                   "/T100_log_" + QDateTime::currentDateTime().toString("hh.mm.ss_dd.MM.yyyy"),
                                    "Text files (*.txt)");
 
         m_logFile.setFileName(fileName);
@@ -354,7 +355,7 @@ void MainWindow::on_config_showADC_checkBox_toggled(bool checked)
 
 void MainWindow::on_config_movAvg_spinBox_valueChanged(int arg1)
 {
-    /* Set filter length to 8 for the graph update */
+    /* Set filter length to _something_ for the graph update */
     graphFilter.setFilterLen(arg1);
 }
 
