@@ -10,6 +10,7 @@ QTimer *timer;
 QFile m_logFile;
 bool m_logRunning;
 QTimer *timer_1sec;
+QString m_previousMessage;
 QDateTime logStart;
 bool logADC = false;
 bool logColdJunction = false;
@@ -83,6 +84,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_logRunning = false;
     m_currentTempUnit = T100_CELCIUS;
     m_plotHistoryLength = 150;
+    m_previousMessage = "...";
 
     /* Update timer */
     connect(timer, SIGNAL(timeout()), this, SLOT(updateEvent()));
@@ -255,7 +257,9 @@ void MainWindow::on_logTab_pushButton_clicked()
 
             QString logMessage = QInputDialog::getText(this, tr("Log Message"),
                                                     tr("Log message:"), QLineEdit::Normal,
-                                                    "...", &ok);
+                                                    m_previousMessage, &ok);
+
+            m_previousMessage = logMessage;
 
             m_logRunning = true;
 
