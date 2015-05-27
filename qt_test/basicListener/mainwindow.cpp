@@ -15,6 +15,7 @@ QDateTime logStart;
 bool logADC = false;
 bool logColdJunction = false;
 MovAvg graphFilter(8);
+QString m_logDirectory;
 int m_currentTempUnit;
 QVector<t100*> t100_list;
 TableModel myTableModel(0);
@@ -85,6 +86,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_currentTempUnit = T100_CELCIUS;
     m_plotHistoryLength = 150;
     m_previousMessage = "...";
+
+    QStringList documentLocations = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation);
+    m_logDirectory = documentLocations.first();
 
     /* Update timer */
     connect(timer, SIGNAL(timeout()), this, SLOT(updateEvent()));
@@ -237,97 +241,108 @@ void MainWindow::on_logTab_pushButton_clicked()
     }
     else
     {
-        QStringList documentLocations = QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation);
-
-        QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"),documentLocations.first() +
-                                   "/T100_log_" + QDateTime::currentDateTime().toString("hh.mm.ss_dd.MM.yyyy"),
-                                   "Text files (*.txt)");
-
-        m_logFile.setFileName(fileName);
-
-        if(!m_logFile.open(QIODevice::WriteOnly | QIODevice::Text))
+        if(t100Helper_getDeviceCount() > 0)
         {
-            ui->logTab_textEdit->moveCursor (QTextCursor::End);
-            ui->logTab_textEdit->insertPlainText ("File I/O problem!\n");
-            ui->logTab_textEdit->moveCursor (QTextCursor::End);
+            QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), m_logDirectory +
+                                       "/T100_log_" + QDateTime::currentDateTime().toString("hh.mm.ss_dd.MM.yyyy") + ".csv",
+                                       "Text files (*.csv)");
+
+            int last_slash = 0;
+            last_slash = fileName.lastIndexOf('/');
+            m_logDirectory = fileName.left(last_slash);
+
+            m_logFile.setFileName(fileName);
+
+            if(!m_logFile.open(QIODevice::WriteOnly | QIODevice::Text))
+            {
+                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+                ui->logTab_textEdit->insertPlainText ("File I/O problem!\n");
+                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+            }
+            else
+            {
+                bool ok;
+
+                QString logMessage = QInputDialog::getText(this, tr("Log Message"),
+                                                        tr("Log message:"), QLineEdit::Normal,
+                                                        m_previousMessage, &ok);
+
+                m_previousMessage = logMessage;
+
+                m_logRunning = true;
+
+                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+                ui->logTab_textEdit->insertPlainText ("Log started.\n");
+                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+                ui->logTab_pushButton->setText("Stop Logging");
+
+                ui->logTab_lcdNumber->display("00:00:00");
+                logStart = QDateTime::currentDateTime();
+
+                QTextStream out(&m_logFile);
+                QString tempUnitString;
+                int deviceIndex = ui->logTab_comboBox->currentIndex();
+
+                logADC = ui->config_logADC_checkBox->isChecked();
+                logColdJunction = ui->config_logColdJunction_checkBox->isChecked();
+
+                if(m_currentTempUnit == T100_KELVIN)
+                {
+                    tempUnitString = " (K)";
+                }
+                if(m_currentTempUnit == T100_FAHRENHEIT)
+                {
+                    tempUnitString = " (F)";
+                }
+                else
+                {
+                    tempUnitString = " (C)";
+                }
+
+
+                out << "[Log message]: " + logMessage + "\n";
+                out << "/ *Some informative text about hardware/software version */\n";
+                out << "YYYY-MM-DDThh:mm:ss.sss, ";
+
+                if(logADC && logColdJunction)
+                {
+                    out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                    out << tempUnitString;
+                    out << ", JT<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                    out << tempUnitString;
+                    out << ", ADC<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + "> (mV)";
+                    out << "\n";
+                }
+                else if(logADC)
+                {
+                    out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                    out << tempUnitString;
+                    out << ", ADC<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + "> (mV)";
+                    out << "\n";
+                }
+                else if(logColdJunction)
+                {
+                    out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                    out << tempUnitString;
+                    out << ", JT<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                    out << tempUnitString;
+                    out << "\n";
+                }
+                else
+                {
+                    out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
+                    out << tempUnitString;
+                    out << "\n";
+                }
+
+                timer_1sec->start(1000);
+            }
         }
         else
         {
-            bool ok;
-
-            QString logMessage = QInputDialog::getText(this, tr("Log Message"),
-                                                    tr("Log message:"), QLineEdit::Normal,
-                                                    m_previousMessage, &ok);
-
-            m_previousMessage = logMessage;
-
-            m_logRunning = true;
-
             ui->logTab_textEdit->moveCursor (QTextCursor::End);
-            ui->logTab_textEdit->insertPlainText ("Log started.\n");
+            ui->logTab_textEdit->insertPlainText ("No device to log!\n");
             ui->logTab_textEdit->moveCursor (QTextCursor::End);
-            ui->logTab_pushButton->setText("Stop Logging");
-
-            ui->logTab_lcdNumber->display("00:00:00");
-            logStart = QDateTime::currentDateTime();
-
-            QTextStream out(&m_logFile);
-            QString tempUnitString;
-            int deviceIndex = ui->logTab_comboBox->currentIndex();
-
-            logADC = ui->config_logADC_checkBox->isChecked();
-            logColdJunction = ui->config_logColdJunction_checkBox->isChecked();
-
-            if(m_currentTempUnit == T100_KELVIN)
-            {
-                tempUnitString = " (K)";
-            }
-            if(m_currentTempUnit == T100_FAHRENHEIT)
-            {
-                tempUnitString = " (F)";
-            }
-            else
-            {
-                tempUnitString = " (C)";
-            }
-
-
-            out << "[Log message]: " + logMessage + "\n";
-            out << "/ *Some informative text about hardware/software version */\n";           
-            out << "YYYY-MM-DDThh:mm:ss.sss, ";
-
-            if(logADC && logColdJunction)
-            {
-                out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
-                out << tempUnitString;
-                out << ", JT<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
-                out << tempUnitString;
-                out << ", ADC<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + "> (mV)";
-                out << "\n";
-            }
-            else if(logADC)
-            {
-                out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
-                out << tempUnitString;
-                out << ", ADC<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + "> (mV)";
-                out << "\n";
-            }
-            else if(logColdJunction)
-            {
-                out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
-                out << tempUnitString;
-                out << ", JT<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
-                out << tempUnitString;
-                out << "\n";
-            }
-            else
-            {
-                out << "T<" + QString::number(t100_list.at(deviceIndex)->getMySerialNumber()) + ">";
-                out << tempUnitString;
-                out << "\n";
-            }
-
-            timer_1sec->start(1000);
         }
     }
 }
