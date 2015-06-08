@@ -321,6 +321,33 @@ int t100::setPgaGain(uint8_t gain)
   return 0;
 }
 /*---------------------------------------------------------------------------*/
+int t100::setSparePin(int state)
+{
+    int rval;
+
+    /* GPIO command */
+    internalBuffer[0] = 2;
+
+    if(state)
+    {
+        internalBuffer[1] = 1;
+    }
+    else
+    {
+        internalBuffer[1] = 0;
+    }
+
+    rval = sendData(internalBuffer,32);
+
+    if(rval < 0)
+    {
+      this->problem = true;
+      return -1;
+    }
+
+    return 0;
+}
+/*---------------------------------------------------------------------------*/
 int t100::setThermocoupleType(int type)
 {
   /* TODO: Check whether this is a valid type or not! */

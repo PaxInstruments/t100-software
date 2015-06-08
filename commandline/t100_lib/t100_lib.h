@@ -216,11 +216,19 @@ class t100
     */
   int setThermocoupleType(int type);
 
+  /**
+    * Sets the spare pin output High/Low state.
+    *
+    * @param state 1 for High, 0 for Low.
+    * @return 0 for success and -1 for connection error.
+    */
+  int setSparePin(int state);
+
     /**
     * Sets the temperature unit.
     *
     * @param type Temperature unit
-    * @return 0 for success and -1 for wrong thermocouple type.
+    * @return 0 for success and -1 for wrong temperature unit.
     */
   int setTemperatureUnit(int type);
 
