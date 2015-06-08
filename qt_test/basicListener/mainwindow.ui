@@ -39,7 +39,7 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -124,22 +124,22 @@
      <widget class="QGroupBox" name="groupBox_4">
       <property name="geometry">
        <rect>
-        <x>280</x>
-        <y>140</y>
-        <width>121</width>
-        <height>61</height>
+        <x>360</x>
+        <y>10</y>
+        <width>91</width>
+        <height>51</height>
        </rect>
       </property>
       <property name="title">
-       <string>Thermocouple Type</string>
+       <string>Thermocouple</string>
       </property>
       <widget class="QComboBox" name="comboBox_2">
        <property name="geometry">
         <rect>
-         <x>3</x>
-         <y>30</y>
-         <width>111</width>
-         <height>26</height>
+         <x>2</x>
+         <y>24</y>
+         <width>81</width>
+         <height>21</height>
         </rect>
        </property>
       </widget>
@@ -259,6 +259,29 @@
          </widget>
         </item>
        </layout>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_6">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>120</y>
+        <width>161</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Indication Led</string>
+      </property>
+      <widget class="QComboBox" name="indicationLed_comboBox">
+       <property name="geometry">
+        <rect>
+         <x>3</x>
+         <y>30</y>
+         <width>151</width>
+         <height>26</height>
+        </rect>
+       </property>
       </widget>
      </widget>
     </widget>

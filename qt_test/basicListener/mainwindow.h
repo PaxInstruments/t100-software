@@ -36,6 +36,8 @@ private slots:
 
     void on_config_movAvg_spinBox_2_valueChanged(int arg1);
 
+    void on_indicationLed_comboBox_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
 };

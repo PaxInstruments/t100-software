@@ -17,6 +17,8 @@ bool logColdJunction = false;
 MovAvg graphFilter(8);
 QString m_logDirectory;
 int m_currentTempUnit;
+int m_blinkIndex;
+int m_blinkState = 0;
 QVector<t100*> t100_list;
 TableModel myTableModel(0);
 int m_plotHistoryLength;
@@ -67,14 +69,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     /* Set filter length to 8 for the graph update */
     graphFilter.setFilterLen(8);
 
+    ui->indicationLed_comboBox->addItem("N/A");
+
     for(int i=0;i<t100Helper_getDeviceCount();i++)
     {
         ui->logTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
         ui->graphTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+        ui->indicationLed_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
     }
 
     ui->logTab_comboBox->setCurrentIndex(0);
     ui->graphTab_comboBox->setCurrentIndex(0);
+    ui->indicationLed_comboBox->setCurrentIndex(0);
 
     /* Log UI settings */
     ui->logTab_lcdNumber->display("00:00:00");
@@ -82,6 +88,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->logTab_textEdit->insertPlainText ("Ready ...\n");
     ui->logTab_textEdit->moveCursor (QTextCursor::End);
 
+    m_blinkIndex = -1;
     m_logRunning = false;
     m_currentTempUnit = T100_CELCIUS;
     m_plotHistoryLength = 150;
@@ -162,6 +169,17 @@ void MainWindow::updateEvent()
 
     if(t100Helper_getDeviceCount() > 0)
     {        
+
+        if(m_blinkIndex >= 0)
+        {
+            if(t100_list.at(m_blinkIndex)->isAlive())
+            {
+                m_blinkState = !m_blinkState;
+                t100_list.at(m_blinkIndex)->setSparePin(m_blinkState);
+            }
+        }
+
+
         t100Helper_periodicUpdate(t100_list);
 
         myTableModel.updateData();
@@ -208,12 +226,17 @@ void MainWindow::on_rescan_pushButton_clicked()
 
     ui->logTab_comboBox->clear();
     ui->graphTab_comboBox->clear();
+    ui->indicationLed_comboBox->clear();    
+    ui->indicationLed_comboBox->addItem("N/A");
 
     for(int i=0;i<t100Helper_getDeviceCount();i++)
     {
         ui->logTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
         ui->graphTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+        ui->indicationLed_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
     }
+
+    ui->indicationLed_comboBox->setCurrentIndex(0);
 }
 
 void MainWindow::on_logTab_radioButton_2_toggled(bool checked)
@@ -415,4 +438,17 @@ void MainWindow::on_config_movAvg_spinBox_2_valueChanged(int arg1)
 {
     m_plotHistoryLength = arg1;
     ui->myPlot->graph(0)->clearData();
+}
+
+void MainWindow::on_indicationLed_comboBox_currentIndexChanged(int index)
+{
+    if(m_blinkIndex >= 0)
+    {
+        if(t100_list.at(m_blinkIndex)->isAlive())
+        {
+            t100_list.at(m_blinkIndex)->setSparePin(0);
+        }
+    }
+
+    m_blinkIndex = index - 1;
 }
