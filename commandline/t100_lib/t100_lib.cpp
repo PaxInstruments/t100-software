@@ -152,11 +152,21 @@ int t100::readData(uint8_t* buf,uint8_t len)
     return -1;
   }
   
+#ifdef LINUX
+  /* Store the data */
+  for(int i = 2; i < (rval-1); ++i)
+  {
+    buf[i-2] = tempBuffer[i];
+  }  
+#endif
+
+#ifdef OSX
   /* Store the data */
   for(int i = 1; i < rval; ++i)
   {
     buf[i-1] = tempBuffer[i];
   }
+#endif
 
   return (rval-1);
 }
