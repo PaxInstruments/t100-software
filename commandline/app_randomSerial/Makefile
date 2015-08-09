@@ -13,13 +13,16 @@ CXX = g++
 # Linux specific configuration
 #------------------------------------------------------------------------------
 ifeq ($(shell uname), Linux)
-	$(error Your platform $(shell uname) is not supported at this time.)
+	COBJS = ../hidapi/linux/hid.o	
+	LIBS = -ludev
+	CFLAGS += -DLINUX
 #------------------------------------------------------------------------------
 # OSX specific configuration
 #------------------------------------------------------------------------------
 else ifeq ($(shell uname), Darwin)
 	COBJS = ../hidapi/mac/hid.o
 	LIBS  = -framework IOKit -framework CoreFoundation
+	CFLAGS += -DOSX
 #------------------------------------------------------------------------------
 # Windows specific configuration
 #------------------------------------------------------------------------------
