@@ -8,6 +8,7 @@
 #define T100_LIB
 
 #include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <string.h>
