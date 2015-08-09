@@ -41,6 +41,7 @@ int main(int argc, char* argv[])
 
 	for(i=0;i<t100_count;i++)
 	{
+		t100_list[i].init();
 		printf("> Connecting to #%d\n",t100_coordinator.getSerialNumber(i));
 		rval = t100_list[i].connectBySerial(t100_coordinator.getSerialNumber(i));
 		if(rval < 0)
