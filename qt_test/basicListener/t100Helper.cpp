@@ -23,7 +23,7 @@ t100* createT100()
 
 void t100Helper_periodicUpdate(QVector<t100*> &deviceList)
 {
-    for(int i=0;i<deviceCount;i++)
+    for(int i=0;i<deviceList.size();i++)
     {
         deviceList.at(i)->periodicUpdate();
     }
@@ -32,9 +32,12 @@ void t100Helper_periodicUpdate(QVector<t100*> &deviceList)
 void t100Helper_fillDeviceList(QVector<t100*> &deviceList)
 {
     int rval;
+    int loopCount;
     int errorCount = 0;
 
-    for(int i=0;i<deviceCount;i++)
+    loopCount = deviceList.size();
+
+    for(int i=0;i<loopCount;i++)
     {
         t100* tmp = deviceList.at(0);
 
