@@ -456,7 +456,7 @@ void MainWindow::on_config_movAvg_spinBox_2_valueChanged(int arg1)
 
 void MainWindow::on_indicationLed_comboBox_currentIndexChanged(int index)
 {
-    if(m_blinkIndex >= 0)
+    if((m_blinkIndex >= 0) && (t100_list.size() > 0))
     {
         if(t100_list.at(m_blinkIndex)->isAlive())
         {
