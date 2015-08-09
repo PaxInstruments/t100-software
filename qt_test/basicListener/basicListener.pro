@@ -14,8 +14,17 @@ TEMPLATE = app
 INCLUDEPATH +=  ../../commandline/hidapi/hidapi/
 INCLUDEPATH +=  ../../commandline/t100_lib/
 
+#-------------------------------------------------
+# Prerequiste: sudo apt-get install libudev-dev libusb-1.0-0-dev
+#-------------------------------------------------
+linux: SOURCES += ../../commandline/hidapi/linux/hid.c
+linux: LIBS += -ludev
+#-------------------------------------------------
+
+#-------------------------------------------------
 macx: SOURCES += ../../commandline/hidapi/mac/hid.c
 macx: LIBS += -framework CoreFoundation -framework IOkit
+#-------------------------------------------------
 
 SOURCES += ../../commandline/t100_lib/t100_lib.cpp \
     t100Helper.cpp \
