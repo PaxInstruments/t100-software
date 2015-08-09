@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "movAvg.h"
 #include <QTabWidget>
+#include <QMessageBox>
 #include "TableModel.h"
 #include "t100Helper.h"
 #include <QStandardPaths>
@@ -217,26 +218,39 @@ void MainWindow::updateEvent()
 }
 
 void MainWindow::on_rescan_pushButton_clicked()
-{    
-    /* Do the rescan */
-    t100Helper_fillDeviceList(t100_list);
-
-    /* Update row counts based on new devices */
-    myTableModel.updateRowCounts();
-
-    ui->logTab_comboBox->clear();
-    ui->graphTab_comboBox->clear();
-    ui->indicationLed_comboBox->clear();    
-    ui->indicationLed_comboBox->addItem("N/A");
-
-    for(int i=0;i<t100Helper_getDeviceCount();i++)
+{
+    if(m_logRunning)
     {
-        ui->logTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
-        ui->graphTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
-        ui->indicationLed_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+        QMessageBox::warning(this,"Warning","You must stop recording before rescan",QMessageBox::Ok,QMessageBox::NoButton);
     }
+    else
+    {
+        /* Stop the update timer */
+        timer->stop();
 
-    ui->indicationLed_comboBox->setCurrentIndex(0);
+        /* Do the rescan */
+        t100Helper_fillDeviceList(t100_list);
+
+        /* Update row counts based on new devices */
+        myTableModel.updateRowCounts();
+
+        ui->logTab_comboBox->clear();
+        ui->graphTab_comboBox->clear();
+        ui->indicationLed_comboBox->clear();
+        ui->indicationLed_comboBox->addItem("N/A");
+
+        for(int i=0;i<t100Helper_getDeviceCount();i++)
+        {
+            ui->logTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+            ui->graphTab_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+            ui->indicationLed_comboBox->addItem(QString::number(t100_list.at(i)->getMySerialNumber()));
+        }
+
+        ui->indicationLed_comboBox->setCurrentIndex(0);
+
+        /* Restart update timer */
+        timer->start();
+    }
 }
 
 void MainWindow::on_logTab_radioButton_2_toggled(bool checked)
