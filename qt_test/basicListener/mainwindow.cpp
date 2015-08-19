@@ -54,6 +54,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     /* Don't allow resize */
     this->setFixedSize(this->size());
 
+#ifdef LINUX
+    QFont font = ui->centralWidget->font();
+    font.setPointSize(10);
+    ui->centralWidget->setFont(font);
+#endif
+
     ui->myPlot->addGraph();
     ui->myPlot->graph(0)->setPen(QPen(Qt::blue));
     ui->myPlot->xAxis->setTickLabelType(QCPAxis::ltDateTime);
