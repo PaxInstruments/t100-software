@@ -8,7 +8,7 @@ QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
-TARGET = basicListener
+TARGET = LabSticks
 TEMPLATE = app
 
 INCLUDEPATH += ../../commandline/hidapi/hidapi/
