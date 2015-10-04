@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>  
+<head>
+  <link rel="stylesheet" type="text/css" href="style.css"/>  
+  <script type="text/javascript" src="./canvasjs.min.js"></script>
+  <script type="text/javascript" src="./jquery-2.0.3.min.js"></script>  
+  <script type="text/javascript" src="./functions.js"></script>
+</head>
+<body>
+  <div id="mainBody">
+    <div id="header">      
+      <center><h1>LabSticks T100 - Web Interface</h1></center>
+    </div>
+    <div class="container">
+      <div id="deviceTable">
+        <table id="myTable">
+        </table>
+      </div>
+      <div id="graph">
+        <br>
+        <div id="chartContainer">       
+        </div>  
+        <br>
+        <div id="textBox">
+          <textarea readonly style="resize:none" id="myTextArea"></textarea>
+        </div>
+      </div>
+    </div>
+    <div id="controls">
+      <button style="margin-top: 5px; margin-left: 5px" onclick="searchDevices()">searchDevices()</button>      
+    </div>    
+  </div>
+</body>
+</html>

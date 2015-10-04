@@ -1,0 +1,69 @@
+body {
+    background: url("./tile.jpg");
+}
+#mainBody
+{
+  width: 80%;
+  max-width: 1000px;
+  margin: auto;
+}
+#header
+{
+  height: 50px;
+  background-color:#C2C2C2;
+}
+#dataPortion
+{
+  display: table-row;       
+  background-color:#F2F2F2;
+}   
+#graph
+{
+  width: 50%;       
+  margin: auto;     
+  height: 500px;
+  display: table-cell;
+  background-color:#F2F2F2;
+}
+#chartContainer
+{
+  width: 90%;   
+  margin: auto;   
+  height: 50%;      
+}
+#deviceTable
+{
+  width: 50%;     
+  display: table-cell;              
+  background-color:#F2F2F2;
+}
+#textBox
+{
+  width: 90%;
+  margin: auto;
+  height: 40%;     
+}
+#myTextArea
+{
+  width: 100%;
+  margin: auto;
+  height: 95%;
+}
+.container
+{
+  display: flex;
+}
+#controls
+{
+  height: 30px;
+  background-color:#C2C2C2;
+}
+table, td {
+  border: 1px solid;
+}
+#myTable
+{
+  width: 95%;
+  margin: auto;
+  margin-top: 10px;     
+}
