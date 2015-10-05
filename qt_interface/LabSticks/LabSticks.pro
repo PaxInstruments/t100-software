@@ -24,7 +24,7 @@ linux: QMAKE_CXXFLAGS += -DLINUX
 
 #-------------------------------------------------
 macx: SOURCES += ../../commandline/hidapi/mac/hid.c
-macx: LIBS += -framework CoreFoundation -framework IOkit
+macx: LIBS += -framework CoreFoundation -framework IOKit
 macx: QMAKE_CXXFLAGS += -DOSX
 #-------------------------------------------------
 
