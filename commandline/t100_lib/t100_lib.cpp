@@ -87,7 +87,11 @@ int t100::searchDevices()
   { 
     if((cur_dev->vendor_id == VID) && (cur_dev->product_id == PID))
     {     
+      #if WIN
       t100_deviceSerials[t100_totalDevices] = _wcstoui64(cur_dev->serial_number,NULL,0);
+      #else
+      t100_deviceSerials[t100_totalDevices] = wcstoul(cur_dev->serial_number,NULL,0);
+      #endif
       t100_totalDevices++;
     }   
     cur_dev = cur_dev->next;
