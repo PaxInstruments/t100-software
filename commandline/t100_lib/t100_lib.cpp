@@ -26,6 +26,8 @@ void t100::init()
   this->problem = false;
 
   this->temperatureUnit = T100_CELCIUS;
+
+  memset(internalBuffer,0x00,32);
 }
 /*---------------------------------------------------------------------------*/
 void t100::disconnect()
@@ -51,7 +53,7 @@ int t100::connectBasic()
 int t100::connectBySerial(uint64_t serial)
 {
   wchar_t buf[16];
-  swprintf(buf, sizeof(buf) / sizeof(*buf), L"%lu", serial);
+  swprintf(buf, sizeof(buf) / sizeof(*buf), L"%llu", serial);
 
   this->t100_handle = hid_open(VID, PID, buf);
 
@@ -85,7 +87,7 @@ int t100::searchDevices()
   { 
     if((cur_dev->vendor_id == VID) && (cur_dev->product_id == PID))
     {     
-      t100_deviceSerials[t100_totalDevices] = wcstoul(cur_dev->serial_number,NULL,0);
+      t100_deviceSerials[t100_totalDevices] = _wcstoui64(cur_dev->serial_number,NULL,0);
       t100_totalDevices++;
     }   
     cur_dev = cur_dev->next;
@@ -115,6 +117,23 @@ int t100::sendData(uint8_t* buf, uint8_t len)
   /* Reset the buffer */
   memset(tempBuffer,0x00,256);
 
+#if WIN
+
+  /* Dummy report ID */
+  tempBuffer[0] = 0;
+  tempBuffer[1] = 1;
+
+  /* Store the data */
+  for(int i = 0; i < len; ++i)
+  {
+    tempBuffer[i+2] = buf[i];
+  }
+
+  /* Send the data */
+  rval = hid_send_feature_report(this->t100_handle, tempBuffer, len+2);
+
+#else
+
   /* Dummy report ID */
   tempBuffer[0] = 1;
 
@@ -126,6 +145,8 @@ int t100::sendData(uint8_t* buf, uint8_t len)
 
   /* Send the data */
   rval = hid_send_feature_report(this->t100_handle, tempBuffer, len+1);
+
+#endif
 
   if(rval < 0)
   {
@@ -168,6 +189,14 @@ int t100::readData(uint8_t* buf,uint8_t len)
   }
 #endif
 
+#if WIN
+  /* Store the data */
+  for(int i = 2; i < (rval-1); ++i)
+  {
+    buf[i-2] = tempBuffer[i];
+  }
+#endif
+
   return (rval-1);
 }
 /*---------------------------------------------------------------------------*/
@@ -176,7 +205,8 @@ int t100::periodicUpdate()
   int rval;
 
   /* Get update command */
-  internalBuffer[0] = 1;     
+  memset(internalBuffer,0x00,32);
+  internalBuffer[0] = 1;
   rval = sendData(internalBuffer,32);
 
   if(rval < 0)
@@ -186,6 +216,7 @@ int t100::periodicUpdate()
   }   
 
   /* Get actual data */
+  memset(internalBuffer,0x00,32);
   rval = readData(internalBuffer,32);
 
   if(rval < 0)
@@ -316,6 +347,7 @@ int t100::setPgaGain(uint8_t gain)
   }  
 
   /* Set PGA command */
+  memset(internalBuffer,0x00,32);
   internalBuffer[0] = 4;     
   internalBuffer[1] = bitVal;
   rval = sendData(internalBuffer,32);
@@ -336,6 +368,7 @@ int t100::setSparePin(int state)
     int rval;
 
     /* GPIO command */
+    memset(internalBuffer,0x00,32);
     internalBuffer[0] = 2;
 
     if(state)

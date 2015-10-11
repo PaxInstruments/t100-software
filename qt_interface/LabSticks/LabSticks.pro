@@ -28,6 +28,12 @@ macx: LIBS += -framework CoreFoundation -framework IOKit
 macx: QMAKE_CXXFLAGS += -DOSX
 #-------------------------------------------------
 
+#-------------------------------------------------
+win32: SOURCES += ../../commandline/hidapi/windows/hid.c
+win32: LIBS += -lsetupapi
+win32: QMAKE_CXXFLAGS += -DWIN
+#-------------------------------------------------
+
 SOURCES += ../../commandline/t100_lib/t100_lib.cpp \
     t100Helper.cpp \
     TableModel.cpp \
