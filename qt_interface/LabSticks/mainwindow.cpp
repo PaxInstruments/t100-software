@@ -10,6 +10,7 @@
 QTimer *timer;
 QFile m_logFile;
 bool m_logRunning;
+bool m_readyToLog;
 QTimer *timer_1sec;
 QString m_previousMessage;
 QDateTime logStart;
@@ -21,6 +22,7 @@ int m_currentTempUnit;
 int m_blinkIndex;
 int m_blinkState = 0;
 QVector<t100*> t100_list;
+QString m_logMessage;
 TableModel myTableModel(0);
 int m_plotHistoryLength;
 
@@ -95,6 +97,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->logTab_textEdit->insertPlainText ("Ready ...\n");
     ui->logTab_textEdit->moveCursor (QTextCursor::End);
 
+    m_readyToLog = false;
     m_blinkIndex = -1;
     m_logRunning = false;
     m_currentTempUnit = T100_CELCIUS;
@@ -110,7 +113,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     /* Log counter timer */
     connect(timer_1sec, SIGNAL(timeout()), this, SLOT(timer1sec_event()));
-
 }
 
 MainWindow::~MainWindow()
@@ -275,43 +277,63 @@ void MainWindow::on_logTab_pushButton_clicked()
     if(m_logRunning)
     {
         m_logFile.close();
+        m_readyToLog = false;
         m_logRunning = false;
         timer_1sec->stop();
         ui->logTab_textEdit->moveCursor (QTextCursor::End);
         ui->logTab_textEdit->insertPlainText ("Log ended.\n");
         ui->logTab_textEdit->moveCursor (QTextCursor::End);
-        ui->logTab_pushButton->setText("Start Logging");
+        ui->logTab_pushButton->setText("Prepare for Logging");
     }
     else
     {
-        if(t100Helper_getDeviceCount() > 0)
+        if(m_readyToLog == false)
         {
-            QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), m_logDirectory +
-                                       "/T100_log_" + QDateTime::currentDateTime().toString("hh.mm.ss_dd.MM.yyyy") + ".csv",
-                                       "Text files (*.csv)");
-
-            int last_slash = 0;
-            last_slash = fileName.lastIndexOf('/');
-            m_logDirectory = fileName.left(last_slash);
-
-            m_logFile.setFileName(fileName);
-
-            if(!m_logFile.open(QIODevice::WriteOnly | QIODevice::Text))
+            if(t100Helper_getDeviceCount() > 0)
             {
-                ui->logTab_textEdit->moveCursor (QTextCursor::End);
-                ui->logTab_textEdit->insertPlainText ("File I/O problem!\n");
-                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+                QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), m_logDirectory +
+                                           "/T100_log_" + QDateTime::currentDateTime().toString("hh.mm.ss_dd.MM.yyyy") + ".csv",
+                                           "Text files (*.csv)");
+
+                int last_slash = 0;
+                last_slash = fileName.lastIndexOf('/');
+                m_logDirectory = fileName.left(last_slash);
+
+                m_logFile.setFileName(fileName);
+
+                if(!m_logFile.open(QIODevice::WriteOnly | QIODevice::Text))
+                {
+                    ui->logTab_textEdit->moveCursor (QTextCursor::End);
+                    ui->logTab_textEdit->insertPlainText ("File I/O problem!\n");
+                    ui->logTab_textEdit->moveCursor (QTextCursor::End);
+                }
+                else
+                {
+                    bool ok;
+
+                    m_logMessage = QInputDialog::getText(this, tr("Log Message"),
+                                                            tr("Log message:"), QLineEdit::Normal,
+                                                            m_previousMessage, &ok);
+
+                    m_previousMessage = m_logMessage;
+
+                    ui->logTab_pushButton->setText("Start Logging");
+
+                    m_readyToLog = true;
+                }
             }
             else
             {
-                bool ok;
+                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+                ui->logTab_textEdit->insertPlainText ("No device to log!\n");
+                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+            }
 
-                QString logMessage = QInputDialog::getText(this, tr("Log Message"),
-                                                        tr("Log message:"), QLineEdit::Normal,
-                                                        m_previousMessage, &ok);
-
-                m_previousMessage = logMessage;
-
+        }
+        else
+        {
+            if(t100Helper_getDeviceCount() > 0)
+            {
                 m_logRunning = true;
 
                 ui->logTab_textEdit->moveCursor (QTextCursor::End);
@@ -342,8 +364,7 @@ void MainWindow::on_logTab_pushButton_clicked()
                     tempUnitString = " (C)";
                 }
 
-
-                out << "[Log message]: " + logMessage + "\n";
+                out << "[Log message]: " + m_logMessage + "\n";
                 out << "/ *Some informative text about hardware/software version */\n";
                 out << "YYYY-MM-DDThh:mm:ss.sss, ";
 
@@ -380,12 +401,12 @@ void MainWindow::on_logTab_pushButton_clicked()
 
                 timer_1sec->start(1000);
             }
-        }
-        else
-        {
-            ui->logTab_textEdit->moveCursor (QTextCursor::End);
-            ui->logTab_textEdit->insertPlainText ("No device to log!\n");
-            ui->logTab_textEdit->moveCursor (QTextCursor::End);
+            else
+            {
+                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+                ui->logTab_textEdit->insertPlainText ("No device to log!\n");
+                ui->logTab_textEdit->moveCursor (QTextCursor::End);
+            }
         }
     }
 }
