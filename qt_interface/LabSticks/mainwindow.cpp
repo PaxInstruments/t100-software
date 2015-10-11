@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     myTableModel.setCurrentRowCounts();
     myTableModel.setCurrentColumnCounts(3);
 
-    ui->tabWidget->setCurrentIndex(0);    
+    ui->tabWidget->setCurrentIndex(3);
 
     /* Set the model and show */
     ui->myTableView->setModel(&myTableModel);
