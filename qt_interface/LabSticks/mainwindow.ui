@@ -39,8 +39,62 @@
      <enum>QTabWidget::Rounded</enum>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
+    <property name="movable">
+     <bool>false</bool>
+    </property>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>Real-time graph</string>
+     </attribute>
+     <widget class="QCustomPlot" name="myPlot" native="true">
+      <property name="geometry">
+       <rect>
+        <x>4</x>
+        <y>8</y>
+        <width>441</width>
+        <height>171</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>190</y>
+        <width>451</width>
+        <height>49</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Current Device ID for Plotting:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="graphTab_comboBox"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="logTab_statusLabel">
+         <property name="text">
+          <string>Status: Idle ...</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="logTab_lastReadLabel">
+         <property name="text">
+          <string>Last Read: ...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
     <widget class="QWidget" name="tab">
      <attribute name="title">
       <string>Readings</string>
@@ -397,57 +451,6 @@
       <property name="readOnly">
        <bool>true</bool>
       </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>Real-time graph</string>
-     </attribute>
-     <widget class="QCustomPlot" name="myPlot" native="true">
-      <property name="geometry">
-       <rect>
-        <x>4</x>
-        <y>8</y>
-        <width>441</width>
-        <height>171</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>190</y>
-        <width>451</width>
-        <height>49</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Current Device ID for Plotting:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="graphTab_comboBox"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="logTab_statusLabel">
-         <property name="text">
-          <string>Status: Idle ...</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLabel" name="logTab_lastReadLabel">
-         <property name="text">
-          <string>Last Read: ...</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
     </widget>
    </widget>
